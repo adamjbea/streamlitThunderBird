@@ -19,18 +19,15 @@ def all_imgs_directory(directory):
     image_list = []
     filenames = []
     print("Reading in Images..")
-    for filename in glob.glob(directory + '/*.jpg'):
-        if 'Analyzed' not in filename:
-            im=Image.open(filename)
-            filenames.append(filename)
-            image_list.append(im)
     for filename in glob.glob(directory + '/*.PNG'):
+        st.write("FileName: ", filename)
         if 'Analyzed' not in filename:
             im=Image.open(filename)
             filenames.append(filename)
             im = im.convert('RGB')
             image_list.append(im)
     for filename in glob.glob(directory + '/*.JPG'):
+        st.write("FileName: ", filename)
         if 'Analyzed' not in filename:
             im=Image.open(filename)
             filenames.append(filename)
