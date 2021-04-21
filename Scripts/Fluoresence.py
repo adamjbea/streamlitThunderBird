@@ -273,7 +273,6 @@ def plot_figures(imgs,drops):
     # Plot merged image if it exists
 
     if 'RGB' in imgs.keys():
-        st.write("rgb in imgs.keys")
         plt.subplot(1,nc+1,nc+1)
         plt.imshow(np.multiply(imgs['RGB'],imgs['BW'][:,:,None]))
         plt.xticks([])
