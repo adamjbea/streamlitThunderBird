@@ -31,7 +31,6 @@ def Fluorescence_Controller(dire):
     with st.spinner('You are running Fluoresence Analysis...'):
       data = Read_Decide_Analyze(identifier_and_images,dire)
     st.success("Done!")
-    st.balloons()
     return data
 
   #return CSV_DATA
@@ -423,16 +422,12 @@ def Flourecence_Image_Reader(dire):
   uploaded = []
   return_list = []
   uploaded,filenames = all_imgs_directory(dire)
-  st.write("Uploaded: ", uploaded)
-  st.write("Directory: ", dire)
   filenames = [filename.replace(dire + '/', '') for filename in filenames]
   
   #format: [[set_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]], [img_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]]]
   identifier_and_images = []
   
   if filenames:
-    st.write("Filenames: ", filenames)
-
     image_iter_folder = 0
     for key in uploaded:
       if key == None:
@@ -449,12 +444,9 @@ def Flourecence_Image_Reader(dire):
       #Lubna-cy5_Slide 4_D_p00_0_A01f01d3
       #Lubna-cy5_Slide 4_D_p00_0_A01f01d4
       #2. What's its name?
-      st.write("pre image name ", filenames[image_iter_folder])
       j = 0
       image_name = filenames[image_iter_folder].replace(dire, '')
-      st.write("Image_name: ", image_name)
       reversed_name = image_name[::-1]
-      st.write("reversed name ", reversed_name)
       for letter in reversed_name:
         if letter == ' ' or letter == '_' or letter == '-':
           break      
@@ -483,15 +475,12 @@ def Flourecence_Image_Reader(dire):
 ######################################################################################
 def Read_Decide_Analyze(identifier_and_images,Directory, Output_Browser=True):
 
-  st.write("IDIMGSET: ", identifier_and_images)
   final_data = pd.DataFrame()
   name_images = []
  # what type of image set is this? Then run analysis
   for image_set in identifier_and_images:
-    print("\n\n#############################")
     #reverse back for human readability
     name = image_set[0][::-1]
-    st.write("Name: ,", name)
     number_pictures = len(image_set[1])
     name_Mixed = None
     if number_pictures <= 4:
@@ -499,58 +488,35 @@ def Read_Decide_Analyze(identifier_and_images,Directory, Output_Browser=True):
       img_set = [empty_array,empty_array,empty_array,empty_array]
       
       for i in range(len(image_set[1])):
-        st.write("I", i)
         color = image_set[1][i][1]
-        st.write("Color: ", color)
         image = image_set[1][i][0]
         
         if color == "grey":
           name_BF = image_set[1][i][2]
           img_set[0] = image
-          st.write(image_set[1][i][2])
-
         elif color == "red":
           name_CY5 = image_set[1][i][2]
           img_set[1] = image
-          st.write(image_set[1][i][2])
-
         elif color == "blue": 
           name_DAPI = image_set[1][i][2]
           img_set[2] = image
-          st.write(image_set[1][i][2])
-
         elif color == "green":
           name_GFP = image_set[1][i][2]
           img_set[3] = image
-          st.write(image_set[1][i][2])
-
         elif color == "bf_mixed":
           name_Mixed = image_set[1][i][2]
-          st.write(image_set[1][i][2])
-
-      st.write("0: ", img_set[0].any())
-      st.write("1: ", img_set[1].any())
-      st.write("2: ", img_set[2].any())
-      st.write("3: ", img_set[3].any())
-
 
       if img_set[0].any() and img_set[2].any() and img_set[3].any():    
-        st.write("Set BW_B_G: ", name)
         imgs = load_images(dirpath = Directory+'/',BF = name_BF, GFP = name_GFP, DAPI = name_DAPI)
       elif img_set[0].any() and img_set[1].any() and img_set[3].any(): 
-        st.write("Set BW_R_G: ", name)
         imgs = load_images(dirpath = Directory+'/',BF = name_BF, GFP = name_GFP, CY5 = name_CY5)
       elif img_set[0].any() and img_set[1].any(): 
-        st.write("Set BW_R: ", name)
         imgs = load_images(dirpath = Directory+'/',BF = name_BF, CY5 = name_CY5)
       elif img_set[0].any() and img_set[3].any(): 
-        st.write("Set BW_G: ", name)
         imgs = load_images(dirpath = Directory+'/',BF = name_BF, GFP = name_GFP)
       elif img_set[0].any() and img_set[2].any(): 
-        st.write("Set BW_B: ", name)
         imgs = load_images(dirpath = Directory+'/',BF = name_BF, DAPI = name_DAPI)
       elif name_Mixed is not None:
-        st.write("Set RGB: ", name)
         imgs = load_images(dirpath = Directory+'/',RGB = name_Mixed)
       else:
         st.write("No Process Match: ", name)
@@ -565,5 +531,5 @@ def Read_Decide_Analyze(identifier_and_images,Directory, Output_Browser=True):
         st.write("Error:", e)
     
     else:
-      print("more images than expected in category: " + name)
+      st.write("more images than expected in category: ", name)
   return final_data

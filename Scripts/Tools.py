@@ -6,6 +6,14 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+def get_all_directory(input_dir):
+    directories = []
+    if input_dir:
+        if input_dir[-1] != '/':
+            input_dir += '/'
+        directories = glob.glob(input_dir + "**/", recursive=True)
+    return directories
+###############################################################################
 def Write_CSV(*args,custom_name): #For each column, pass a list where the first entry is the column's name.
     st.write(custom_name)
     rows = zip(*args)
@@ -18,16 +26,13 @@ def Write_CSV(*args,custom_name): #For each column, pass a list where the first 
 def all_imgs_directory(directory):
     image_list = []
     filenames = []
-    print("Reading in Images..")
     for filename in glob.glob(directory + '/*.PNG'):
-        st.write("FileName: ", filename)
         if 'Analyzed' not in filename:
             im=Image.open(filename)
             filenames.append(filename)
             im = im.convert('RGB')
             image_list.append(im)
     for filename in glob.glob(directory + '/*.JPG'):
-        st.write("FileName: ", filename)
         if 'Analyzed' not in filename:
             im=Image.open(filename)
             filenames.append(filename)
