@@ -263,7 +263,7 @@ def plot_figures(imgs,drops):
         if isinstance(outline_color, str):
           plt.scatter(x=XX+np.multiply(np.cos(TH),RR),y=YY+np.multiply(np.sin(TH),RR),color=outline_color,s=.5)
         else:
-          plt.scatter(x=XX+np.multiply(np.cos(TH),RR),y=YY+np.multiply(np.sin(TH),RR),c=outline_color,s=.5)
+          plt.scatter(x=XX+np.multiply(np.cos(TH),RR),y=YY+np.multiply(np.sin(TH),RR),color=outline_color,s=.5)
 
         plt.xticks([])
         plt.yticks([])
