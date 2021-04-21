@@ -2,6 +2,9 @@ from Scripts.Tools import get_all_directory
 from Scripts import Fluoresence as flu
 from datetime import datetime
 import streamlit as st
+import warnings
+
+warnings.filterwarnings('ignore')
 
 #@title RUN / MAIN
 
