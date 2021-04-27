@@ -10,6 +10,7 @@ import pandas as pd
 from .Tools import *
 from .Detection import Color_Detection
 import streamlit as st
+import io as io
 #@title Fluorescence Analysis
 
 SCATTER_THRESH = .4     # Position of threshold between min and max of scatter
@@ -21,6 +22,19 @@ MIN_DIAM       = 65     # Minimum drop diameter in microns
 MIN_DIAM_PERIM = .25    # Minimum diameter to perimeter ratio (~eccentricity). For circle, diam/perim = 1/pi = 0.32
 VALID_COLORS   = ['RGB','BF','DAPI','GFP','RFP','CY5'] # Colors that can be loaded from files
 VALID_FLUOR    = ['BF','DAPI','GFP','RFP','CY5']       # Fluorescence channels that can be displayed
+
+###############################################################################
+def new_Controller(dire):
+  return_list = []
+  #format: [[set1_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]], [set2_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]]]
+  identifier_and_images = new_Image_Reader(dire)
+  if identifier_and_images != []:
+    with st.spinner('You are running Fluoresence Analysis...'):
+      data = Read_Decide_Analyze(identifier_and_images,dire)
+    st.success("Done!")
+    return data
+
+  #return CSV_DATA
 
 ###############################################################################
 def Fluorescence_Controller(dire):
@@ -414,8 +428,6 @@ def fluor_metrics(drops):
     metrics['Area>2XMed'] = np.sum(np.square(diam[np.square(diam)>2*med**2]))/np.sum(np.square(diam))
 
     return(metrics)
-    
-
 ###############################################################################
 def Flourecence_Image_Reader(dire):
   uploaded = []
@@ -431,7 +443,7 @@ def Flourecence_Image_Reader(dire):
     for key in uploaded:
       if key == None:
         break
-      img = np.asarray(key)  
+      img = np.asarray(key)
       #####################
       #Algorithm: Image Set Generation
       #1.What color?
@@ -489,7 +501,6 @@ def Read_Decide_Analyze(identifier_and_images,Directory, Output_Browser=True):
       for i in range(len(image_set[1])):
         color = image_set[1][i][1]
         image = image_set[1][i][0]
-        
         if color == "grey":
           name_BF = image_set[1][i][2]
           img_set[0] = image
@@ -527,7 +538,7 @@ def Read_Decide_Analyze(identifier_and_images,Directory, Output_Browser=True):
         name_images.append(name)
         plot_figures(imgs,drops)
       except Exception as e:
-        st.write("Error:", e)
+        pass
     
     else:
       st.write("more images than expected in category: ", name)

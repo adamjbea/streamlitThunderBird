@@ -3,6 +3,8 @@ from Scripts import Fluoresence as flu
 from datetime import datetime
 import streamlit as st
 import warnings
+import tkinter as tk
+from tkinter import filedialog
 
 warnings.filterwarnings('ignore')
 
@@ -17,7 +19,20 @@ Date = st.sidebar.text_input('Date', datetime.today().strftime('%m/%d/%Y'))
 Run_ID = st.sidebar.text_input('Run_ID', '')
 Analysis_Type = st.sidebar.selectbox('Type', 
                                     ('Fluoresence', 'placeholder', 'placeholder'))
-input_dire = st.sidebar.text_input('Directory', )
+#input_dire = st.sidebar.text_input('Directory', )
+input_files = []
+# Set up tkinter
+root = tk.Tk()
+root.withdraw()
+
+# Make folder picker dialog appear on top of other windows
+root.wm_attributes('-topmost', 1)
+
+# Folder picker button
+input_dire = []
+clicked = st.sidebar.button('Folder Picker')
+if clicked:
+    input_dire = st.sidebar.text_input('Selected folder:', filedialog.askdirectory(master=root))
 directories = get_all_directory(input_dire)
 CSV_Data = [[Name,Date,Run_ID,Analysis_Type]]
 for dire in directories:
