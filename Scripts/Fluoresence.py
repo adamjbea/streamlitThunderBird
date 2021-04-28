@@ -24,28 +24,15 @@ VALID_COLORS   = ['RGB','BF','DAPI','GFP','RFP','CY5'] # Colors that can be load
 VALID_FLUOR    = ['BF','DAPI','GFP','RFP','CY5']       # Fluorescence channels that can be displayed
 
 ###############################################################################
-def new_Controller(dire):
-  return_list = []
-  #format: [[set1_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]], [set2_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]]]
-  identifier_and_images = new_Image_Reader(dire)
-  if identifier_and_images != []:
-    with st.spinner('You are running Fluoresence Analysis...'):
-      data = Read_Decide_Analyze(identifier_and_images,dire)
-    st.success("Done!")
-    return data
-
-  #return CSV_DATA
-
-###############################################################################
 def Fluorescence_Controller(dire):
   return_list = []
   #format: [[set1_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]], [set2_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]]]
   identifier_and_images = Flourecence_Image_Reader(dire)
   if identifier_and_images != []:
     with st.spinner('You are running Fluoresence Analysis...'):
-      data = Read_Decide_Analyze(identifier_and_images,dire)
+      container = Read_Decide_Analyze(identifier_and_images,dire)
     st.success("Done!")
-    return data
+    return container[0], container[1]
 
   #return CSV_DATA
 
@@ -215,7 +202,7 @@ def find_drops(imgs):
     return drops
 
 ###############################################################################
-def plot_figures(imgs,drops):
+def plot_figures(name,imgs,drops):
     ''' 
     Plots masked fluorescent images (where there are drops) and 2D scatters of Diameter/fluorescent combinations.
     
@@ -374,6 +361,7 @@ def plot_figures(imgs,drops):
 
             cnt += 1
     #plt.show()
+    fig.savefig(name + ".png")
     st.pyplot(fig)
     
 
@@ -536,10 +524,11 @@ def Read_Decide_Analyze(identifier_and_images,Directory, Output_Browser=True):
         final_data = final_data.append(fluor_metrics(drops), ignore_index=True)
         st.write(final_data)
         name_images.append(name)
-        plot_figures(imgs,drops)
+        plot_figures(name,imgs,drops)
       except Exception as e:
         pass
     
     else:
       st.write("more images than expected in category: ", name)
-  return final_data
+  st.write("NAME", name)
+  return [name, final_data]
