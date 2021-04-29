@@ -10,7 +10,6 @@ import pandas as pd
 from .Tools import *
 from .Detection import Color_Detection
 import streamlit as st
-import io as io
 #@title Fluorescence Analysis
 
 SCATTER_THRESH = .4     # Position of threshold between min and max of scatter
@@ -24,15 +23,13 @@ VALID_COLORS   = ['RGB','BF','DAPI','GFP','RFP','CY5'] # Colors that can be load
 VALID_FLUOR    = ['BF','DAPI','GFP','RFP','CY5']       # Fluorescence channels that can be displayed
 
 ###############################################################################
-def Fluorescence_Controller(dire):
+def Fluorescence_Controller(input_dire, dire):
   return_list = []
   #format: [[set1_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]], [set2_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]]]
   identifier_and_images = Flourecence_Image_Reader(dire)
   if identifier_and_images != []:
-    with st.spinner('You are running Fluoresence Analysis...'):
-      container = Read_Decide_Analyze(identifier_and_images,dire)
-    st.success("Done!")
-    return container[0], container[1]
+    container = Read_Decide_Analyze(identifier_and_images,dire, input_dire)
+    return container
 
   #return CSV_DATA
 
@@ -202,7 +199,8 @@ def find_drops(imgs):
     return drops
 
 ###############################################################################
-def plot_figures(name,imgs,drops):
+def plot_figures(input_dire,name,imgs,drops):
+
     ''' 
     Plots masked fluorescent images (where there are drops) and 2D scatters of Diameter/fluorescent combinations.
     
@@ -361,8 +359,8 @@ def plot_figures(name,imgs,drops):
 
             cnt += 1
     #plt.show()
-    fig.savefig(name + ".png")
-    st.pyplot(fig)
+    fig.savefig(input_dire + "/" + "Analyzed" + name + ".png")
+    return fig
     
 
 ###############################################################################
@@ -472,8 +470,8 @@ def Flourecence_Image_Reader(dire):
 
 
 ######################################################################################
-def Read_Decide_Analyze(identifier_and_images,Directory, Output_Browser=True):
-
+def Read_Decide_Analyze(identifier_and_images,Directory, input_dire):
+  img_res = []
   final_data = pd.DataFrame()
   name_images = []
  # what type of image set is this? Then run analysis
@@ -516,19 +514,14 @@ def Read_Decide_Analyze(identifier_and_images,Directory, Output_Browser=True):
         imgs = load_images(dirpath = Directory+'/',BF = name_BF, DAPI = name_DAPI)
       elif name_Mixed is not None:
         imgs = load_images(dirpath = Directory+'/',RGB = name_Mixed)
-      else:
-        st.write("No Process Match: ", name)
       
       try:
         drops = find_drops(imgs)
         final_data = final_data.append(fluor_metrics(drops), ignore_index=True)
-        st.write(final_data)
         name_images.append(name)
-        plot_figures(name,imgs,drops)
+        new_fig = plot_figures(input_dire,name,imgs,drops)
+        img_res.append([name, new_fig])
       except Exception as e:
         pass
-    
-    else:
-      st.write("more images than expected in category: ", name)
-  st.write("NAME", name)
-  return [name, final_data]
+  container = [final_data, img_res]
+  return container

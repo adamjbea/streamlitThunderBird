@@ -3,8 +3,6 @@ from PIL import Image
 import cv2
 from matplotlib import pyplot as plt
 import numpy as np
-import pandas as pd
-import streamlit as st
 
 def get_all_directory(input_dir):
     directories = []
@@ -13,15 +11,6 @@ def get_all_directory(input_dir):
             input_dir += '/'
         directories = glob.glob(input_dir + "**/", recursive=True)
     return directories
-###############################################################################
-def Write_CSV(*args,custom_name): #For each column, pass a list where the first entry is the column's name.
-    st.write(custom_name)
-    rows = zip(*args)
-    row_list = list(rows)
-    data = np.array(row_list, dtype=object)
-    df = pd.DataFrame.from_records(data)
-    st.write(df)
-
 ###############################################################################
 def all_imgs_directory(directory):
     image_list = []
