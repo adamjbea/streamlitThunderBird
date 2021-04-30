@@ -364,7 +364,7 @@ def plot_figures(input_dire,name,imgs,drops):
     
 
 ###############################################################################
-def fluor_metrics(drops):
+def fluor_metrics(drops, name):
 
     ''' 
     Return DataFrame 'metrics' with drop readouts
@@ -399,6 +399,7 @@ def fluor_metrics(drops):
     good = drops['good']
 
     # Iterate through channels
+    metrics['Name'] = name
     for i in range(nc):
         d = drops[colors[i]][good]
         metrics[colors[i]+'+'] = [np.sum((d>drops['color_thresh'][i]))/len(d)]
@@ -407,7 +408,6 @@ def fluor_metrics(drops):
     # Calculate non-fluorescent metrics
     drop_count = np.sum(good)
     metrics['Drop_Count'] = drop_count
-
     diam = drops['Diameter'][good]
     med = np.median(diam)
     metrics['MedDropDiam'] = med
@@ -517,7 +517,7 @@ def Read_Decide_Analyze(identifier_and_images,Directory, input_dire):
       
       try:
         drops = find_drops(imgs)
-        final_data = final_data.append(fluor_metrics(drops), ignore_index=True)
+        final_data = final_data.append(fluor_metrics(drops, name), ignore_index=True)
         name_images.append(name)
         new_fig = plot_figures(input_dire,name,imgs,drops)
         img_res.append([name, new_fig])

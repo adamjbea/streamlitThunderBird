@@ -3,6 +3,7 @@ import warnings
 import tkinter as tk
 from tkinter import filedialog
 import Main as main
+from PIL import Image
 warnings.filterwarnings('ignore')
 
 #INPUTS
@@ -26,9 +27,12 @@ if clicked:
             for cont in cont_list:
                 if cont is not None:
                     cont[0].to_csv(input_dire + "/" + "Analyzed" + Name + "_" + Run_ID + "_" + Analysis_Type  + ".csv", index=True)
+                    st.write(cont[0])
                     for name, img in cont[1]:
                         st.write("File: ", name)
-                        st.pyplot(img)
+                        #st.pyplot(img)
                         img.savefig(input_dire + "/" + "Analyzed" + name + ".png")
-                    st.balloons()
+                        saved_img = Image.open(input_dire + "/" + "Analyzed" + name + ".png")
+                        st.image(saved_img)
     st.success("Done!")
+    st.balloons()
