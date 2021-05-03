@@ -7,8 +7,8 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 from scipy.ndimage.morphology import grey_dilation
 import pandas as pd
-from PIL import Image
-import glob
+import Tools
+import Detection
 #@title Fluorescence Analysis
 
 SCATTER_THRESH = .4     # Position of threshold between min and max of scatter
@@ -21,72 +21,6 @@ MIN_DIAM_PERIM = .25    # Minimum diameter to perimeter ratio (~eccentricity). F
 VALID_COLORS   = ['RGB','BF','DAPI','GFP','RFP','CY5'] # Colors that can be loaded from files
 VALID_FLUOR    = ['BF','DAPI','GFP','RFP','CY5']       # Fluorescence channels that can be displayed
 
-def all_imgs_directory(directory):
-    image_list = []
-    filenames = []
-    for filename in glob.glob(directory + '/*.PNG'):
-        if 'Analyzed' not in filename:
-            im=Image.open(filename)
-            filenames.append(filename)
-            im = im.convert('RGB')
-            image_list.append(im)
-    for filename in glob.glob(directory + '/*.JPG'):
-        if 'Analyzed' not in filename:
-            im=Image.open(filename)
-            filenames.append(filename)
-            im = im.convert('RGB')
-            image_list.append(im)
-    
-    return image_list,filenames
-
-#Look at a random pixel in an image and see what color it is
-###############################################################################
-def Color_Detection(cd_img: np.array):
-  color_detected = "ERROR_Color_Detection"
-
-
-  if (len(cd_img.shape)<3):
-    return 'grey'
-
-  color_avg = cd_img.mean(axis=0).mean(axis=0)
-  #print("COLOR AVERAGE: " + color_avg)
-  color_std = round(np.std(color_avg),2)
-  color_intensity = np.mean(color_avg)
-  if color_std != 0.0:
-    intensity_std = color_intensity/color_std
-    offset = intensity_std*1.5
-
-  if color_std == 0:
-    color_detected = 'grey'
-
-  elif intensity_std > 5:
-    color_detected = 'bf_mixed'
-
-  elif color_avg[0] > color_avg[1] + offset and color_avg [0] > color_avg[2] + offset:
-    color_detected = 'red'
-
-  elif color_avg[1] > color_avg[0] + offset and color_avg [1] > color_avg[2] + offset:
-    color_detected = 'green'
-
-  elif color_std < 15 and color_std > 2:
-    color_detected = 'mixed'
-    
-  elif color_avg[2] > color_avg[1] + offset and color_avg [2] > color_avg[0] + offset:
-    color_detected = 'blue'
-
-  return color_detected
-
-###############################################################################
-def Image_Data_Convert(img, target_type_min, target_type_max, target_type):
-    imin = img.min()
-    imax = img.max()
-
-    a = (target_type_max - target_type_min) / (imax - imin)
-    b = target_type_max - a * imax
-    new_img = (a * img + b).astype(target_type)
-    return new_img
-
-###############################################################################
 def Fluorescence_Controller(input_dire, dire):
   return_list = []
   #format: [[set1_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]], [set2_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]]]
@@ -152,7 +86,7 @@ def load_images(dirpath='',**kwargs):
             color_img [ color_img < 0 ] = 0
             imgs[color] = color_img/mx
             if len(imgs[color].shape) == 3:
-              imgs[color] = Image_Data_Convert(imgs[color], 0, 255, np.uint8)
+              imgs[color] = Tools.Image_Data_Convert(imgs[color], 0, 255, np.uint8)
               imgs[color] = cv2.cvtColor(imgs[color], cv2.COLOR_BGR2GRAY)
     
     mn = np.quantile(imgs['BF'],.05)
@@ -485,7 +419,7 @@ def fluor_metrics(drops, name):
 def Flourecence_Image_Reader(dire):
   uploaded = []
   return_list = []
-  uploaded,filenames = all_imgs_directory(dire)
+  uploaded,filenames = Tools.all_imgs_directory(dire)
   filenames = [filename.replace(dire + '/', '') for filename in filenames]
   
   #format: [[set_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]], [img_identity, [[img1,color,name],[img2,color,name],[img3,color,name]]]]
@@ -500,7 +434,7 @@ def Flourecence_Image_Reader(dire):
       #####################
       #Algorithm: Image Set Generation
       #1.What color?
-      color = Color_Detection(img)
+      color = Detection.Color_Detection(img)
 
       #Example image names, number is the color (d4 is normally brightfield)
       #Lubna-cy5_Slide 4_D_p00_0_A01f00d3
