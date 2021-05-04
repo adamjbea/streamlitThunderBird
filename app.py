@@ -15,7 +15,7 @@ def get_all_directory(input_dir):
         directories = glob.glob(input_dir + "**/", recursive=True)
     return directories
 
-def run(input_dire):
+def run_flu(input_dire):
     cont_list = []
     st.write("Analysis Progress")
     my_bar = st.progress(0)
@@ -48,7 +48,7 @@ def main():
         input_dire = st.sidebar.text_input('Selected Input Folder:', filedialog.askdirectory(master=root))
         if Analysis_Type == "Fluorescence":
             with st.spinner('You are running Fluoresence Analysis...'):
-                cont_list = run(input_dire)
+                cont_list = run_flu(input_dire)
                 if cont_list is not None:
                     for cont in cont_list:
                         if cont is not None:
