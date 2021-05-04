@@ -35,7 +35,7 @@ def main():
     cont_list = []
     Name = st.sidebar.text_input('Name', '')
     Run_ID = st.sidebar.text_input('Run_ID', '')
-    Analysis_Type = st.sidebar.selectbox('Type', ('Fluoresence', ))
+    Analysis_Type = st.sidebar.selectbox('Type', ('Fluorescence', 'Brightfield', ))
     CSV_Output_Browser = st.sidebar.checkbox("Output CSV to Browser")
     Image_Output_Browser = st.sidebar.checkbox("Output Images to Browser")
     # Tkinter Folder Picker #
@@ -46,23 +46,24 @@ def main():
     clicked = st.sidebar.button('Input Folder Picker')
     if clicked:
         input_dire = st.sidebar.text_input('Selected Input Folder:', filedialog.askdirectory(master=root))
-        with st.spinner('You are running Fluoresence Analysis...'):
-            cont_list = run(input_dire)
-            if cont_list is not None:
-                for cont in cont_list:
-                    if cont is not None:
-                        if CSV_Output_Browser:
-                            cont[0].to_csv(input_dire + "/" + "Analyzed" + Name + "_" + Run_ID + "_" + Analysis_Type  + ".csv", index=True)
-                            st.write(cont[0])
-                        with st.spinner("Displaying images for the run..."):
-                            for name, img in cont[1]:
-                                if Image_Output_Browser:
-                                    st.write("File: ", name)
-                                    st.pyplot(img)
-                                img.savefig(input_dire + "/" + "Analyzed" + name + ".png")
-                        st.success("Images Displayed! Set Complete")
-        st.success("Done!")
-        st.balloons()
+        if Analysis_Type == "Fluorescence":
+            with st.spinner('You are running Fluoresence Analysis...'):
+                cont_list = run(input_dire)
+                if cont_list is not None:
+                    for cont in cont_list:
+                        if cont is not None:
+                            if CSV_Output_Browser:
+                                cont[0].to_csv(input_dire + "/" + "Analyzed" + Name + "_" + Run_ID + "_" + Analysis_Type  + ".csv", index=True)
+                                st.write(cont[0])
+                            with st.spinner("Displaying images for the run..."):
+                                for name, img in cont[1]:
+                                    if Image_Output_Browser:
+                                        st.write("File: ", name)
+                                        st.pyplot(img)
+                                    img.savefig(input_dire + "/" + "Analyzed" + name + ".png")
+                            st.success("Images Displayed! Set Complete")
+            st.success("Done!")
+            st.balloons()
 
 if __name__ == '__main__':
     main()
