@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import filedialog
 import glob
 import Fluoresence as flu
+import Brightfield as bf
+from PIL import Image
 
 warnings.filterwarnings('ignore')
 
@@ -31,7 +33,21 @@ def run_flu(input_dire):
     return cont_list
 
 def run_bf(input_dire):
-    st.write("Test complete")
+    st.write("Test starting")
+    cont_list = []
+    st.write("Analysis Progress")
+    my_bar = st.progress(0)
+    directories = get_all_directory(input_dire)
+    amount = 1 / len(directories)
+    last_amount = 0
+    if input_dire:
+        for dire in directories:
+            cont = bf.Brightfield_Controller(dire)
+            my_bar.progress(last_amount + amount)
+            last_amount += amount
+            cont_list.append(cont)
+    return cont_list
+
 
 def main():
     #INPUTS
@@ -69,20 +85,16 @@ def main():
             st.balloons()
         if Analysis_Type == "Brightfield":
             with st.spinner('You are running Brightfield Analysis...'):
-                cont_list = run_bf(input_dire)
-                if cont_list is not None:
-                    for cont in cont_list:
-                        if cont is not None:
-                            if CSV_Output_Browser:
-                                cont[0].to_csv(input_dire + "/" + "Analyzed" + Name + "_" + Run_ID + "_" + Analysis_Type  + ".csv", index=True)
-                                st.write(cont[0])
-                            with st.spinner("Displaying images for the run..."):
-                                for name, img in cont[1]:
-                                    if Image_Output_Browser:
-                                        st.write("File: ", name)
-                                        st.pyplot(img)
-                                    img.savefig(input_dire + "/" + "Analyzed" + name + ".png")
-                            st.success("Images Displayed! Set Complete")
+                output = run_bf(input_dire)
+                if output is not None:
+                    if Image_Output_Browser:
+                        with st.spinner("Displaying images for the run..."):
+                            for cont in output:
+                                for data in cont:
+                                    st.write("File: ", data[2])
+                                    image = Image.open(data[2])
+                                    st.image(image)
+                        st.success("Images Displayed! Set Complete")
             st.success("Done!")
             st.balloons()
 
