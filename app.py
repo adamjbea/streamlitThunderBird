@@ -30,6 +30,9 @@ def run_flu(input_dire):
             cont_list.append(cont)
     return cont_list
 
+def run_bf(input_dire):
+    st.write("Test complete")
+
 def main():
     #INPUTS
     cont_list = []
@@ -49,6 +52,24 @@ def main():
         if Analysis_Type == "Fluorescence":
             with st.spinner('You are running Fluoresence Analysis...'):
                 cont_list = run_flu(input_dire)
+                if cont_list is not None:
+                    for cont in cont_list:
+                        if cont is not None:
+                            if CSV_Output_Browser:
+                                cont[0].to_csv(input_dire + "/" + "Analyzed" + Name + "_" + Run_ID + "_" + Analysis_Type  + ".csv", index=True)
+                                st.write(cont[0])
+                            with st.spinner("Displaying images for the run..."):
+                                for name, img in cont[1]:
+                                    if Image_Output_Browser:
+                                        st.write("File: ", name)
+                                        st.pyplot(img)
+                                    img.savefig(input_dire + "/" + "Analyzed" + name + ".png")
+                            st.success("Images Displayed! Set Complete")
+            st.success("Done!")
+            st.balloons()
+        if Analysis_Type == "Brightfield":
+            with st.spinner('You are running Brightfield Analysis...'):
+                cont_list = run_bf(input_dire)
                 if cont_list is not None:
                     for cont in cont_list:
                         if cont is not None:
