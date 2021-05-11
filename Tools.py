@@ -3,6 +3,31 @@ import glob
 import numpy as np
 import cv2
 import matplotlib as plt
+import datetime
+import os
+import csv
+import streamlit as st
+import pandas as pd
+
+def Write_CSV(output_folder, Run_ID, CSV_Output_Browser, *args): #For each column, pass a list where the first entry is the column's name.
+  
+  filename = output_folder + "/"+ str(datetime.date.today()) + "_" + Run_ID + "_"
+  
+  i = 0
+  while os.path.exists(f"{filename}{i}.csv"):
+    i += 1
+  try: 
+    rows = zip(*args)
+    with open(f"{filename}{i}.csv", 'w') as output:
+      writer = csv.writer(output, dialect='excel')  #DictWriter can also be used if you pass in a dictionary with column name, row name for all entries.
+      for row in rows:
+        writer.writerow(row[0])
+  except:
+    st.write("THERE IS A PROBLEM IN YOUR DIRECTORY, CHECK THAT YOU HAVE PERMISSION FOR ACCESS")
+  
+  if CSV_Output_Browser:
+    df = pd.read_csv(filename + str(i) + ".csv")
+    st.write(df)
 
 ###############################################################################
 def all_imgs_directory(directory):

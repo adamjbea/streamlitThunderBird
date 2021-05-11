@@ -2,37 +2,18 @@ import Tools
 import Detection
 import numpy as np
 import cv2
-import matplotlib as plt
 import Analyze
 import Visualization
 import streamlit as st
 import Beadcount
-from matplotlib import pyplot as plt
-import pandas as pd
 
-def Brightfield_Controller(dire):
-  df_keys = ["Image Name", 
-              "Image Location", 
-              "Processed Image Location", 
-              "Analysis Type", 
-              "Med Area", 
-              "Area STD", 
-              "#>2x Med", 
-              "Area>2x Med", 
-              "Total Area", 
-              "Emulsion Stability", 
-              " ", 
-              " ", 
-              "Total Drops", 
-              "%Bead Loading", 
-              "Number of Beads", 
-              "Number of No Beads"]
+
+def Brightfield_Controller(dire, Output_Image_Browser):
   uploaded = []
   return_list = []
   uploaded,filenames = Tools.all_imgs_directory(dire)
-  filenames = [filename.replace(dire + '/', '') for filename in filenames]
+  filenames = [filename.replace(dire + "/", '') for filename in filenames]
   if filenames:
-      #st.write(filenames)
       img_bw = []
 
       for key in uploaded:
@@ -45,8 +26,7 @@ def Brightfield_Controller(dire):
       
       if len(img_bw) > 0:
         try:
-          st.write("Running Brightfield Analysis")
-          analysisdata, anlayzed_imgs_bf = Brightfield_Analysis(img_bw)
+          analysisdata, anlayzed_imgs_bf = Brightfield_Analysis(img_bw, Output_Image_Browser)
           i = 0
           for picturedata in analysisdata:     
             filename = filenames[i]
@@ -58,24 +38,11 @@ def Brightfield_Controller(dire):
               cv2.imwrite(save_name, image_to_write) 
             csvappend = [img_name, dire, save_name]
             i += 1
-            temp_data = csvappend + picturedata
-            df = pd.DataFrame()
-            for count, data in enumerate(temp_data):
-              if count == 16:
-                break
-              else:
-                st.write("Count: ", count)
-                st.write("Data: ", data)
-                df[df_keys[count]] = "testing"
-                st.write(df[df_keys[count]])
-            return_list = []
-            for x in range(3):
-              st.write(temp_data[x])
-              return_list.append(temp_data[x])
-            return_list.append(df)
+            return_data = csvappend + picturedata
+            return_list.append(return_data)
           return return_list
         except Exception as e:
-          st.write("Error:", e)
+          st.write(e)
     
   else:
     st.write("I SEE NO IMAGES HERE!\nPlease check the folder and if correct restart application and try again.")
@@ -84,7 +51,7 @@ def Brightfield_Controller(dire):
 # Calls all analysis and detection functions
 # Also is in charge of formatting and presenting information to user
 ###############################################################################
-def Brightfield_Analysis(img_bw):
+def Brightfield_Analysis(img_bw, Output_Image_Browser):
   if img_bw is not None:
     analyzed_img = []
     accurate_circles = []
@@ -148,8 +115,8 @@ def Brightfield_Analysis(img_bw):
           img_blobs = Visualization.Draw_Blobs(circles_img, key_points)
           analyzed_img.append(img_blobs)
           
-          st.write("Radius from Hough")
-          Visualization.Radius_Histogram(circles_grey[0])
+          if Output_Image_Browser:
+            Visualization.Radius_Histogram(circles_grey[0])
           
           """
           st.write("Detection Image")
