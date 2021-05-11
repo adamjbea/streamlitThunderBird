@@ -1,5 +1,6 @@
 import statistics
 import numpy as np
+import streamlit as st
 
 def Analytics_Display(circles, kp_read,zoom):
   radius_list = []
@@ -63,21 +64,22 @@ def Analytics_Display(circles, kp_read,zoom):
   #Display outputs for browser viewing
   #####################
   #Significant speed up if not performed
-  print("\nTotal Drops: " + str(number))
-  print("AVG Size: " + str(avg_r))
-  print("STD: " + str(std_r))
-  print("\n")
-  print(" - MERGER DROP DETECTION - ")
-  print("\n") 
+  """
+  st.write("\nTotal Drops: " + str(number))
+  st.write("AVG Size: " + str(avg_r))
+  st.write("STD: " + str(std_r))
+  st.write("\n")
+  st.write(" - MERGER DROP DETECTION - ")
+  st.write("\n") 
 
-  print("Number of Large Mergers: " + str(num_blobs))
+  st.write("Number of Large Mergers: " + str(num_blobs))
 
-  print("Area of mergers found: " + str(volume_mergers))
+  st.write("Area of mergers found: " + str(volume_mergers))
   
 
-  print("Emulsions Stability; " + str(emulsion_stability))
-  print("Number Blobs and Drops: " + str(num_blobs+number))
-
+  st.write("Emulsions Stability; " + str(emulsion_stability))
+  st.write("Number Blobs and Drops: " + str(num_blobs+number))
+  """
   #####################
 
 

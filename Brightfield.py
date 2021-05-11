@@ -8,14 +8,31 @@ import Visualization
 import streamlit as st
 import Beadcount
 from matplotlib import pyplot as plt
+import pandas as pd
 
 def Brightfield_Controller(dire):
+  df_keys = ["Image Name", 
+              "Image Location", 
+              "Processed Image Location", 
+              "Analysis Type", 
+              "Med Area", 
+              "Area STD", 
+              "#>2x Med", 
+              "Area>2x Med", 
+              "Total Area", 
+              "Emulsion Stability", 
+              " ", 
+              " ", 
+              "Total Drops", 
+              "%Bead Loading", 
+              "Number of Beads", 
+              "Number of No Beads"]
   uploaded = []
   return_list = []
   uploaded,filenames = Tools.all_imgs_directory(dire)
   filenames = [filename.replace(dire + '/', '') for filename in filenames]
   if filenames:
-      #print(filenames)
+      #st.write(filenames)
       img_bw = []
 
       for key in uploaded:
@@ -28,7 +45,7 @@ def Brightfield_Controller(dire):
       
       if len(img_bw) > 0:
         try:
-          print("Running Brightfield Analysis")
+          st.write("Running Brightfield Analysis")
           analysisdata, anlayzed_imgs_bf = Brightfield_Analysis(img_bw)
           i = 0
           for picturedata in analysisdata:     
@@ -41,14 +58,27 @@ def Brightfield_Controller(dire):
               cv2.imwrite(save_name, image_to_write) 
             csvappend = [img_name, dire, save_name]
             i += 1
-            return_data = csvappend + picturedata
-            return_list.append(return_data)
+            temp_data = csvappend + picturedata
+            df = pd.DataFrame()
+            for count, data in enumerate(temp_data):
+              if count == 16:
+                break
+              else:
+                st.write("Count: ", count)
+                st.write("Data: ", data)
+                df[df_keys[count]] = "testing"
+                st.write(df[df_keys[count]])
+            return_list = []
+            for x in range(3):
+              st.write(temp_data[x])
+              return_list.append(temp_data[x])
+            return_list.append(df)
           return return_list
         except Exception as e:
           st.write("Error:", e)
     
   else:
-    print("I SEE NO IMAGES HERE!\nPlease check the folder and if correct restart application and try again.")
+    st.write("I SEE NO IMAGES HERE!\nPlease check the folder and if correct restart application and try again.")
   
 # Handles all brightficeld actions
 # Calls all analysis and detection functions
@@ -62,7 +92,7 @@ def Brightfield_Analysis(img_bw):
     volume_mergers = []
     circles_with_beads = []
 
-    print("Number of brightfield images in folder: " + str(len(img_bw)))
+    st.write("Number of brightfield images in folder: " + str(len(img_bw)))
     
     for img_set in range(len(img_bw)): 
       BAD_IMAGE = False
@@ -99,36 +129,35 @@ def Brightfield_Analysis(img_bw):
         filter = len(accurate_circles)
         if filter>50 and BAD_IMAGE == False:
 
-          circles_img = Visualization.Draw_Circles(processed_img, accurate_circles,circles_with_beads)   
-          print("\n\n#################################################\nNEXT IMAGE BELOW\n")
-          print("Image size: " + str(processed_img.shape))
-          print("ZOOM OF IMAGE IS: " + zoom + " size")
-          print("\n") 
-
-          print(" - HOUGH DROP DETECTION - ")
-
+          circles_img = Visualization.Draw_Circles(processed_img, accurate_circles,circles_with_beads)
+          """ 
+          st.write("#################################################")
+          st.write("NEXT IMAGE BELOW")
+          st.write("Image size: " + str(processed_img.shape))
+          st.write("ZOOM OF IMAGE IS: " + zoom + " size")
+          st.write(" - HOUGH DROP DETECTION - ")
           if zoom == "large":
-            print(" - BEAD COUNTING - ")
-            print("\nTotal Drops: " + str(total_drops))
-            print("Bead: " + str(bead_count))
-            print("Nobead: " + str(nobead_count))
-            print("BEAD LOADING: " + bead_load)
-            print("\n") 
+            st.write(" - BEAD COUNTING - ")
+            st.write("Total Drops: ", str(total_drops))
+            st.write("Bead: ", str(bead_count))
+            st.write("Nobead: ", str(nobead_count))
+            st.write("BEAD LOADING: ", bead_load)
+          """
 
           return_data = Analyze.Analytics_Display(accurate_circles,kp_read,zoom)
           img_blobs = Visualization.Draw_Blobs(circles_img, key_points)
           analyzed_img.append(img_blobs)
           
-          print("\n")
-          print("Radius from Hough")
+          st.write("Radius from Hough")
           Visualization.Radius_Histogram(circles_grey[0])
-          print("\n")
           
-          print("Detection Image")
+          """
+          st.write("Detection Image")
           plt.figure(figsize= (10, 10))
           plt.imshow(img_blobs)
           plt.show()
-
+          #st.image(img_blobs)
+          """
           return_data.append(bead_load)
           return_data.append(bead_count)
           return_data.append(nobead_count)
@@ -145,5 +174,5 @@ def Brightfield_Analysis(img_bw):
         data_collection.append(["COULD NOT DETECT ANYTHING IN THIS IMAGE"])
         analyzed_img.append(processed_img)
   else:
-    print("IMAGES ARE CORRUPTED AND NOTHING WAS DONE")
+    st.write("IMAGES ARE CORRUPTED AND NOTHING WAS DONE")
   return data_collection, analyzed_img

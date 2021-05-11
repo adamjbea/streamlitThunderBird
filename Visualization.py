@@ -8,9 +8,10 @@ from PIL import Image
 import Analyze
 import math 
 import Tools
+import streamlit as st
 
 def Radius_Histogram(circles_grey, circles_blue = 'na', circles_green = 'na'):
-  plt.figure(figsize=(10, 10))
+  fig = plt.figure(figsize=(10, 10))
   if circles_blue == 'na':
     r_bw = circles_grey[:, [2]]
     sns.distplot(r_bw, rug=True, rug_kws={"color": "k"},
@@ -36,7 +37,7 @@ def Radius_Histogram(circles_grey, circles_blue = 'na', circles_green = 'na'):
                     hist_kws={"histtype": "step", "linewidth": .1,
                               "alpha": 1, "color": "k"})
 
-  plt.show()
+  #st.pyplot(fig)
 
 #Plot detected drops to visually determine skew of 3 images
 ###############################################################################

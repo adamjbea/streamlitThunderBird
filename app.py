@@ -6,6 +6,7 @@ import glob
 import Fluoresence as flu
 import Brightfield as bf
 from PIL import Image
+import pandas as pd
 
 warnings.filterwarnings('ignore')
 
@@ -33,7 +34,6 @@ def run_flu(input_dire):
     return cont_list
 
 def run_bf(input_dire):
-    st.write("Test starting")
     cont_list = []
     st.write("Analysis Progress")
     my_bar = st.progress(0)
@@ -84,16 +84,18 @@ def main():
             st.success("Done!")
             st.balloons()
         if Analysis_Type == "Brightfield":
+
             with st.spinner('You are running Brightfield Analysis...'):
                 output = run_bf(input_dire)
+                st.write("Output: ", output)
                 if output is not None:
                     if Image_Output_Browser:
                         with st.spinner("Displaying images for the run..."):
-                            for cont in output:
-                                for data in cont:
-                                    st.write("File: ", data[2])
-                                    image = Image.open(data[2])
-                                    st.image(image)
+                            for data in output:
+                                st.write("File: ", data[2])
+                                image = Image.open(data[2])
+                                st.image(image)
+                                st.write(data[-1])
                         st.success("Images Displayed! Set Complete")
             st.success("Done!")
             st.balloons()
