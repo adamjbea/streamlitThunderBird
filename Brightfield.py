@@ -4,8 +4,8 @@ import numpy as np
 import cv2
 import Analyze
 import Visualization
-import streamlit as st
 import Beadcount
+import streamlit as st
 
 
 def Brightfield_Controller(dire, Output_Image_Browser):
@@ -26,26 +26,23 @@ def Brightfield_Controller(dire, Output_Image_Browser):
       
       if len(img_bw) > 0:
         try:
-          analysisdata, anlayzed_imgs_bf = Brightfield_Analysis(img_bw, Output_Image_Browser)
+          analysisdata, analyzed_imgs_bf, analyzed_figs = Brightfield_Analysis(img_bw, Output_Image_Browser)
           i = 0
           for picturedata in analysisdata:     
             filename = filenames[i]
             img_name = filename.replace(dire, '')
             filename.replace('filename', '')
             save_name = dire + "/Analyzed_BF_" + img_name
-            if len(analysisdata) == len(anlayzed_imgs_bf):
-              image_to_write = cv2.cvtColor(anlayzed_imgs_bf[i], cv2.COLOR_RGB2BGR)
+            if len(analysisdata) == len(analyzed_imgs_bf):
+              image_to_write = cv2.cvtColor(analyzed_imgs_bf[i], cv2.COLOR_RGB2BGR)
               cv2.imwrite(save_name, image_to_write) 
             csvappend = [img_name, dire, save_name]
-            i += 1
-            return_data = csvappend + picturedata
+            return_data = csvappend + [analyzed_figs[i]] + picturedata
             return_list.append(return_data)
+            i += 1
           return return_list
         except Exception as e:
-          st.write(e)
-    
-  else:
-    st.write("I SEE NO IMAGES HERE!\nPlease check the folder and if correct restart application and try again.")
+          return e
   
 # Handles all brightficeld actions
 # Calls all analysis and detection functions
@@ -53,13 +50,12 @@ def Brightfield_Controller(dire, Output_Image_Browser):
 ###############################################################################
 def Brightfield_Analysis(img_bw, Output_Image_Browser):
   if img_bw is not None:
+    fig_list = []
     analyzed_img = []
     accurate_circles = []
     data_collection = []
     volume_mergers = []
     circles_with_beads = []
-
-    st.write("Number of brightfield images in folder: " + str(len(img_bw)))
     
     for img_set in range(len(img_bw)): 
       BAD_IMAGE = False
@@ -116,7 +112,8 @@ def Brightfield_Analysis(img_bw, Output_Image_Browser):
           analyzed_img.append(img_blobs)
           
           if Output_Image_Browser:
-            Visualization.Radius_Histogram(circles_grey[0])
+            fig = Visualization.Radius_Histogram(circles_grey[0])
+            fig_list.append(fig)
           
           """
           st.write("Detection Image")
@@ -140,6 +137,4 @@ def Brightfield_Analysis(img_bw, Output_Image_Browser):
       else:
         data_collection.append(["COULD NOT DETECT ANYTHING IN THIS IMAGE"])
         analyzed_img.append(processed_img)
-  else:
-    st.write("IMAGES ARE CORRUPTED AND NOTHING WAS DONE")
-  return data_collection, analyzed_img
+  return data_collection, analyzed_img, fig_list

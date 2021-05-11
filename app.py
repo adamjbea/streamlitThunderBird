@@ -90,7 +90,9 @@ def main():
         if Analysis_Type == "Brightfield":
             with st.spinner('You are running Brightfield Analysis...'):
                 output = run_bf(input_dire, Image_Output_Browser)
-                if output is not None:
+                if isinstance(output, Exception):
+                    st.write(output)
+                elif output is not None:
                     with st.spinner("Displaying images for the run..."):
                         for cont in output:
                             CSV_Data = []
@@ -111,10 +113,10 @@ def main():
                                             'Number Beads', 
                                             "Number NoBeads"])
                             for data in cont:
-                                st.write(data[2])
                                 if Image_Output_Browser:
                                     image = Image.open(data[2])
                                     st.image(image)
+                                    st.pyplot(data[3])
                                 CSV_Data.append(data)
                             Tools.Write_CSV(input_dire, Run_ID, CSV_Output_Browser, CSV_Data)
                     st.success("Images Displayed! Set Complete")
