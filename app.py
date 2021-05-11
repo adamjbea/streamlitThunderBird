@@ -5,6 +5,7 @@ from tkinter import filedialog
 import glob
 import Fluoresence as flu
 import Brightfield as bf
+import TubeVolume as tube
 from PIL import Image
 import Tools
 import datetime
@@ -55,7 +56,7 @@ def main():
     cont_list = []
     Name = st.sidebar.text_input('Name', '')
     Run_ID = st.sidebar.text_input('Run_ID', '')
-    Analysis_Type = st.sidebar.selectbox('Type', ('Fluorescence', 'Brightfield', ))
+    Analysis_Type = st.sidebar.selectbox('Type', ('Fluorescence', 'Brightfield', 'Tube Volume Analysis' ))
     CSV_Output_Browser = st.sidebar.checkbox("Output CSV to Browser")
     Image_Output_Browser = st.sidebar.checkbox("Output Images to Browser")
     Date = datetime.date.today()
@@ -119,6 +120,7 @@ def main():
                     st.success("Images Displayed! Set Complete")
             st.success("Done!")
             st.balloons()
-
+        if Analysis_Type == "Tube Volume Analysis":
+            tube.process_images(path = input_dire + '/*.jpg')
 if __name__ == '__main__':
     main()
