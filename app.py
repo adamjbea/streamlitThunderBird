@@ -13,19 +13,11 @@ import pandas as pd
 
 warnings.filterwarnings('ignore')
 
-def get_all_directory(input_dir):
-    directories = []
-    if input_dir:
-        if input_dir[-1] != '/':
-            input_dir += '/'
-        directories = glob.glob(input_dir + "**/", recursive=True)
-    return directories
-
 def run_flu(input_dire):
     cont_list = []
     st.write("Analysis Progress")
     my_bar = st.progress(0)
-    directories = get_all_directory(input_dire)
+    directories = Tools.get_all_directory(input_dire)
     amount = 1 / len(directories)
     last_amount = 0
     if input_dire:
@@ -40,7 +32,7 @@ def run_bf(input_dire, Output_Image_Browser):
     cont_list = []
     st.write("Analysis Progress")
     my_bar = st.progress(0)
-    directories = get_all_directory(input_dire)
+    directories = Tools.get_all_directory(input_dire)
     amount = 1 / len(directories)
     last_amount = 0
     if input_dire:
@@ -130,5 +122,6 @@ def main():
             st.balloons()
         if Analysis_Type == "Tube Volume Analysis":
             tube.process_images(path = input_dire + '/*.jpg')
+            
 if __name__ == '__main__':
     main()

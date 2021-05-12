@@ -7,6 +7,14 @@ import datetime
 import os
 import csv
 
+def get_all_directory(input_dir):
+    directories = []
+    if input_dir:
+        if input_dir[-1] != '/':
+            input_dir += '/'
+        directories = glob.glob(input_dir + "**/", recursive=True)
+    return directories
+
 def Write_CSV(output_folder, Run_ID, CSV_Output_Browser, *args): #For each column, pass a list where the first entry is the column's name.
   
   filename = output_folder + "/"+ str(datetime.date.today()) + "_" + Run_ID + "_"
