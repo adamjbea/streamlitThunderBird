@@ -8,7 +8,6 @@ from PIL import Image
 import Analyze
 import math 
 import Tools
-import streamlit as st
 
 def Radius_Histogram(circles_grey, circles_blue = 'na', circles_green = 'na'):
   fig = plt.figure(figsize=(10, 10))
@@ -37,7 +36,7 @@ def Radius_Histogram(circles_grey, circles_blue = 'na', circles_green = 'na'):
                     hist_kws={"histtype": "step", "linewidth": .1,
                               "alpha": 1, "color": "k"})
 
-  st.pyplot(fig)
+  return fig
 
 #Plot detected drops to visually determine skew of 3 images
 ###############################################################################
