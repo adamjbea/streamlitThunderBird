@@ -121,7 +121,11 @@ def main():
             st.success("Done!")
             st.balloons()
         if Analysis_Type == "Tube Volume Analysis":
-            tube.process_images(path = input_dire + '/*.jpg')
-            
+            with st.spinner("Displaying Tube Analysis Images..."):
+                fig_list = tube.process_images(path = input_dire + '/*.jpg')
+                for fig in fig_list:
+                    st.pyplot(fig)
+            st.success("Tube Analysis Images Displayed")
+
 if __name__ == '__main__':
     main()

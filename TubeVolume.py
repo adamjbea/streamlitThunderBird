@@ -4,7 +4,6 @@ from matplotlib import pyplot as plt
 from scipy.ndimage import interpolation, gaussian_filter, median_filter, label, labeled_comprehension
 from scipy.signal import medfilt,convolve2d
 import matplotlib.image as mpimg 
-import streamlit as st
 
 # Constants
 TUBE_PITCH   = 275          # Pixel spacing between tubes
@@ -42,7 +41,7 @@ def process_images(path = ''):
     
     # Set up array of tube volumes for each file, tube, emul/oil
     vols = np.zeros((8,2,len(files)),dtype='float32')
-    
+    fig_list = []
     # Iterate through images
     for i in range(len(files)):
         
@@ -56,9 +55,10 @@ def process_images(path = ''):
         locs,vols[:,:,i] = calc_metrics(tube)
 
         # Plot images with volumes overlaid   
-        plot_volumes(img0,tube,locs,vols[:,:,i],files[i])
+        fig = plot_volumes(img0,tube,locs,vols[:,:,i],files[i])
+        fig_list.append(fig)
 
-    return vols
+    return fig_list
 
 def correct_image(img):
     ''' 
@@ -287,4 +287,6 @@ def plot_volumes(img0,tube,locs,vol,file):
         plt.title('Total Emulsion: %3.0fuL, Total Oil: %3.0fuL'%(np.sum(vol[:,0]),np.sum(vol[:,1])),fontsize=16)
 
     #plt.show()
-    st.pyplot(fig)
+    #st.pyplot(fig)
+
+    return fig
