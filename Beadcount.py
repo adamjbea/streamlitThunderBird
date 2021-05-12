@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import Tools
 from math import inf
+
 def Bead_Counting(circles, img):
 
   bead_count = 0

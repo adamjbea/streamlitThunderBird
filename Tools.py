@@ -6,8 +6,6 @@ import matplotlib as plt
 import datetime
 import os
 import csv
-import streamlit as st
-import pandas as pd
 
 def Write_CSV(output_folder, Run_ID, CSV_Output_Browser, *args): #For each column, pass a list where the first entry is the column's name.
   
@@ -22,12 +20,10 @@ def Write_CSV(output_folder, Run_ID, CSV_Output_Browser, *args): #For each colum
       writer = csv.writer(output, dialect='excel')  #DictWriter can also be used if you pass in a dictionary with column name, row name for all entries.
       for row in rows:
         writer.writerow(row[0])
-  except:
-    st.write("THERE IS A PROBLEM IN YOUR DIRECTORY, CHECK THAT YOU HAVE PERMISSION FOR ACCESS")
+  except Exception as e:
+    return e, None
   
-  if CSV_Output_Browser:
-    df = pd.read_csv(filename + str(i) + ".csv")
-    st.write(df)
+  return i, filename
 
 ###############################################################################
 def all_imgs_directory(directory):

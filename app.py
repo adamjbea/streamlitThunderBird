@@ -9,6 +9,7 @@ import TubeVolume as tube
 from PIL import Image
 import Tools
 import datetime
+import pandas as pd
 
 warnings.filterwarnings('ignore')
 
@@ -93,8 +94,8 @@ def main():
                 if isinstance(output, Exception):
                     st.write(output)
                 elif output is not None:
-                    with st.spinner("Displaying images for the run..."):
-                        for cont in output:
+                    for cont in output:
+                        with st.spinner("Generating Data..."):
                             CSV_Data = []
                             CSV_Data.append(['Image Name', 
                                             'Image Location', 
@@ -118,8 +119,13 @@ def main():
                                     st.image(image)
                                     st.pyplot(data[3])
                                 CSV_Data.append(data)
-                            Tools.Write_CSV(input_dire, Run_ID, CSV_Output_Browser, CSV_Data)
-                    st.success("Images Displayed! Set Complete")
+                            i, filename = Tools.Write_CSV(input_dire, Run_ID, CSV_Output_Browser, CSV_Data)
+                            if filename is None:
+                                st.write(i)
+                            if CSV_Output_Browser:
+                                df = pd.read_csv(filename + str(i) + ".csv")
+                                st.write(df)
+                            st.success("Data Generated, Set Complete!")
             st.success("Done!")
             st.balloons()
         if Analysis_Type == "Tube Volume Analysis":

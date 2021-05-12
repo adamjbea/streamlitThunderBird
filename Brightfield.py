@@ -5,7 +5,6 @@ import cv2
 import Analyze
 import Visualization
 import Beadcount
-import streamlit as st
 
 
 def Brightfield_Controller(dire, Output_Image_Browser):
@@ -111,9 +110,8 @@ def Brightfield_Analysis(img_bw, Output_Image_Browser):
           img_blobs = Visualization.Draw_Blobs(circles_img, key_points)
           analyzed_img.append(img_blobs)
           
-          if Output_Image_Browser:
-            fig = Visualization.Radius_Histogram(circles_grey[0])
-            fig_list.append(fig)
+          fig = Visualization.Radius_Histogram(circles_grey[0])
+          fig_list.append(fig)
           
           """
           st.write("Detection Image")
