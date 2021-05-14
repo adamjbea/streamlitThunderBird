@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 from scipy.ndimage import interpolation, gaussian_filter, median_filter, label, labeled_comprehension
 from scipy.signal import medfilt,convolve2d
 import matplotlib.image as mpimg 
+import streamlit as st
 
 # Constants
 TUBE_PITCH   = 275          # Pixel spacing between tubes
@@ -14,7 +15,7 @@ MED_FILT     = 10           # Median filter size for image (pixels)
 GAUSS_FILT   = 1            # Gaussian filter size for image (pixels)
 GRAY_THRESH  = [.4,.95]     # Set image min and max gray to be [0] and [1] quantile
 EDGE_THRESH  = 15.0/255     # Intensity pixel difference defining a tube edge (threshold of derivative)
-EMUL_SMOOTH  = 21           # Median filter size for smoothing emulsion derivative (pixels)
+EMUL_SMOOTH  = 21          # Median filter size for smoothing emulsion derivative (pixels) 21
 WIDTH_SMOOTH = 15           # Sliding average for smoothing tube width (pixels)
 SCALE_EMUL   = [.8,-10.4] # Scale integrated emulsion volume by [0] and add [1]
 SCALE_OIL    = [1.2,-4]     # Scale integrated oil volume by [0] and add [1]
@@ -93,7 +94,6 @@ def correct_image(img):
     img = (img-mn)/(mx-mn)
     img[img<0] = 0
     img[img>1] = 1
-    
     return (img,img0)
 
 def calc_profiles(img):
@@ -164,7 +164,7 @@ def calc_profiles(img):
     tube['val'][[np.isnan(tube['val'])]] = 0
     tube['width'][[np.isinf(tube['width'])]] = 0
     tube['val'][[np.isinf(tube['val'])]] = 0
-
+    st.write("val: ", tube['val'])
     return tube
 
 def calc_metrics(tube):
@@ -198,19 +198,24 @@ def calc_metrics(tube):
     
     # y derivative of median tube values
     emul_edge = np.diff(tube['val'][OFFSETS[0]:OFFSETS[2]+5,:],axis=0) 
+
+    st.write("emul_edge:", emul_edge)
     
     # Tallest peak is emulsion top
-    locs['Emul_Top'] = np.argmax(emul_edge,axis=0)+OFFSETS[0]    
+    locs['Emul_Top'] = np.argmax(emul_edge,axis=0)+OFFSETS[0]
+    st.write("emultop: ", locs['Emul_Top'])    
     
     # Lowest valley is emulsion bottom
     locs['Emul_Bot'] = np.argmin(emul_edge,axis=0)+OFFSETS[0]  
+    st.write("emulbot: ", locs['Emul_Bot'])
 
     # Tube bend is where width first decreases
     locs['Tube_Bend'] = [np.where(tube['width'][OFFSETS[1]:,i]<.95)[0][0]+OFFSETS[1] for i in range (8)]
+    st.write("tube_bend: ", locs['Tube_Bend'])
                                                              
     # Tube bottom is where width is almost zero
     locs['Tube_Bot'] = [np.where(tube['width'][OFFSETS[2]:,i]<.1)[0][0]+OFFSETS[2]-10 for i in range(8)]
-
+    st.write("tubebottom: ", locs['Tube_Bot'])
     # Find volumes of liquids by converting tube widths into areas and summing, scaling
     vol = np.zeros((8,2))
     for i in range(8):
@@ -223,6 +228,8 @@ def calc_metrics(tube):
         areas = np.power(tube['width'][locs['Emul_Bot'][i]:locs['Tube_Bot'][i],i]*TUBE_DIAM_MM/2,2)*np.pi
         vol[i,1] = abs(np.sum(areas)/PIX_MM * SCALE_OIL[0] + SCALE_OIL[1])
 
+    st.write(locs)
+    st.write(vol)
     return (locs,vol)
 
 def plot_volumes(img0,tube,locs,vol,file):
