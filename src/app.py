@@ -6,7 +6,7 @@ import prime.Fluoresence as flu #type: ignore
 import prime.Brightfield as bf #type: ignore
 import prime.TubeVolume as tube #type: ignore
 from PIL import Image
-import Tools
+import helper.Tools as tools #type: ignore
 import datetime
 import pandas as pd
 
@@ -16,7 +16,7 @@ def run_flu(input_dire):
     cont_list = []
     st.write("Analysis Progress")
     my_bar = st.progress(0)
-    directories = Tools.get_all_directory(input_dire)
+    directories = tools.get_all_directory(input_dire)
     amount = 1 / len(directories)
     last_amount = 0
     if input_dire:
@@ -31,7 +31,7 @@ def run_bf(input_dire, Output_Image_Browser):
     cont_list = []
     st.write("Analysis Progress")
     my_bar = st.progress(0)
-    directories = Tools.get_all_directory(input_dire)
+    directories = tools.get_all_directory(input_dire)
     amount = 1 / len(directories)
     last_amount = 0
     if input_dire:
@@ -110,7 +110,7 @@ def main():
                                     st.image(image)
                                     st.pyplot(data[3])
                                 CSV_Data.append(data)
-                            i, filename = Tools.Write_CSV(input_dire, Run_ID, CSV_Output_Browser, CSV_Data)
+                            i, filename = tools.Write_CSV(input_dire, Run_ID, CSV_Output_Browser, CSV_Data)
                             if filename is None:
                                 st.write(i)
                             if CSV_Output_Browser:
